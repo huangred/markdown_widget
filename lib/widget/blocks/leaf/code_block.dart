@@ -23,8 +23,10 @@ class CodeBlockNode extends ElementNode {
     String? language = preConfig.language;
     try {
       final languageValue =
-          (element.children?.first as m.Element).attributes['class']!;
-      language = languageValue.split('-').last;
+          (element.children?.first as m.Element).attributes['class'];
+      if (languageValue != null) {
+        language = languageValue.split('-').last;
+      }
     } catch (e) {
       language = null;
       debugPrint('get language error:$e');
@@ -37,33 +39,47 @@ class CodeBlockNode extends ElementNode {
     if (codeBuilder != null) {
       return WidgetSpan(child: codeBuilder.call(content, language ?? ''));
     }
-    final widget = Container(
-      decoration: preConfig.decoration,
-      margin: preConfig.margin,
-      padding: preConfig.padding,
-      width: double.infinity,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: List.generate(splitContents.length, (index) {
-            final currentContent = splitContents[index];
-            return ProxyRichText(
-              TextSpan(
-                children: highLightSpans(
-                  currentContent,
-                  language: language ?? preConfig.language,
-                  theme: preConfig.theme,
-                  textStyle: style,
-                  styleNotMatched: preConfig.styleNotMatched,
-                ),
-              ),
-              richTextBuilder: visitor.richTextBuilder,
-            );
-          }),
-        ),
-      ),
+
+    Widget codeContent = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: List.generate(splitContents.length, (index) {
+        final currentContent = splitContents[index];
+        return ProxyRichText(
+          TextSpan(
+            children: highLightSpans(
+              currentContent,
+              language: language ?? preConfig.language,
+              theme: preConfig.theme,
+              textStyle: style,
+              styleNotMatched: preConfig.styleNotMatched,
+            ),
+          ),
+          richTextBuilder: preConfig.richTextBuilder ?? visitor.richTextBuilder,
+        );
+      }),
     );
+
+    codeContent = preConfig.wrapCode
+        ? codeContent
+        : SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: codeContent,
+          );
+    final contentWrapper = preConfig.contentWrapper;
+
+    Widget widget;
+    if (contentWrapper != null) {
+      widget = contentWrapper.call(codeContent, content, language ?? '');
+    } else {
+      widget = Container(
+        decoration: preConfig.decoration,
+        margin: preConfig.margin,
+        padding: preConfig.padding,
+        width: double.infinity,
+        child: codeContent,
+      );
+    }
+
     return WidgetSpan(
         child:
             preConfig.wrapper?.call(widget, content, language ?? '') ?? widget);
@@ -142,11 +158,18 @@ class PreConfig implements LeafConfig {
   /// the [styleNotMatched] is used to set a default TextStyle for code that does not match any theme.
   final TextStyle? styleNotMatched;
   final CodeWrapper? wrapper;
+  final CodeContentWrapper? contentWrapper;
   final CodeBuilder? builder;
+  final RichTextBuilder? richTextBuilder;
 
   ///see package:flutter_highlight/themes/
   final Map<String, TextStyle> theme;
   final String language;
+
+  ///Whether to wrap the code when it exceeds the width of the code block.
+  ///If false (default), the code will be horizontally scrollable.
+  ///If true, the code will wrap to fit the width.
+  final bool wrapCode;
 
   const PreConfig({
     this.padding = const EdgeInsets.all(16.0),
@@ -160,8 +183,17 @@ class PreConfig implements LeafConfig {
     this.theme = a11yLightTheme,
     this.language = 'dart',
     this.wrapper,
+    this.contentWrapper,
     this.builder,
-  }) : assert(builder == null || wrapper == null);
+    this.richTextBuilder,
+    this.wrapCode = false,
+  }) : assert(
+          (builder != null ? 1 : 0) +
+                  (wrapper != null ? 1 : 0) +
+                  (contentWrapper != null ? 1 : 0) <=
+              1,
+          'At most one of builder, wrapper, or contentWrapper can be non-null',
+        );
 
   static PreConfig get darkConfig => const PreConfig(
         decoration: BoxDecoration(
@@ -179,8 +211,12 @@ class PreConfig implements LeafConfig {
     TextStyle? textStyle,
     TextStyle? styleNotMatched,
     CodeWrapper? wrapper,
+    CodeContentWrapper? contentWrapper,
+    CodeBuilder? builder,
     Map<String, TextStyle>? theme,
     String? language,
+    RichTextBuilder? richTextBuilder,
+    bool? wrapCode,
   }) {
     return PreConfig(
       padding: padding ?? this.padding,
@@ -189,8 +225,12 @@ class PreConfig implements LeafConfig {
       textStyle: textStyle ?? this.textStyle,
       styleNotMatched: styleNotMatched ?? this.styleNotMatched,
       wrapper: wrapper ?? this.wrapper,
+      contentWrapper: contentWrapper ?? this.contentWrapper,
+      builder: builder ?? this.builder,
       theme: theme ?? this.theme,
       language: language ?? this.language,
+      richTextBuilder: richTextBuilder ?? this.richTextBuilder,
+      wrapCode: wrapCode ?? this.wrapCode,
     );
   }
 
@@ -199,8 +239,16 @@ class PreConfig implements LeafConfig {
   String get tag => MarkdownTag.pre.name;
 }
 
+/// used to wrap code block widget
 typedef CodeWrapper = Widget Function(
-  Widget child,
+  Widget codeBlock,
+  String code,
+  String language,
+);
+
+/// used to wrap code content widget
+typedef CodeContentWrapper = Widget Function(
+  Widget codeContent,
   String code,
   String language,
 );

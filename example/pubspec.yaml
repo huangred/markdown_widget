@@ -1,6 +1,6 @@
 name: markdown_widget_demo
 description: A new markdown package. It supports TOC function, code highlighting, and it supports all platforms
-version: 1.0.0+5
+version: 1.0.1+7
 publish_to: none
 
 environment:
@@ -26,9 +26,10 @@ dependencies:
   go_router: ^6.2.0
   # for complex table
   flutter_widget_from_html_core: ^0.15.2
+  # for HTTP requests
+  http: ^0.13.5
 
 dev_dependencies:
-  http: ^0.13.5
 
 flutter:
 
