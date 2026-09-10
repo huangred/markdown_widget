@@ -154,8 +154,10 @@ void main() {
                 child: MarkdownWidget(
                   data: testMarkdown,
                   tocController: tocController!,
-                  markdownGenerator:
-                      MarkdownGenerator(headingNodeFilter: headingNodeFilter),
+                  markdownGenerator: MarkdownGenerator(
+                    withDefaultBlockSyntaxes: true,
+                    headingNodeFilter: headingNodeFilter,
+                  ),
                 ),
               ),
             ]),
@@ -184,6 +186,10 @@ void main() {
               ctx = context;
               setter = callback;
               return MarkdownWidget(
+                markdownGenerator: MarkdownGenerator(
+                  withDefaultBlockSyntaxes: true,
+                  withDefaultInlineSyntaxes: true,
+                ),
                 data: text,
                 tocController: tocController,
                 config: MarkdownConfig(configs: [

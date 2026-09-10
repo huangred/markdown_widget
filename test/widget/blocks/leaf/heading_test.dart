@@ -187,7 +187,10 @@ void main() {
   group('Heading rendering with markdown', () {
     testWidgets('should render h1 heading', (tester) async {
       final config = MarkdownConfig();
-      final generator = MarkdownGenerator();
+      final generator = MarkdownGenerator(
+        withDefaultBlockSyntaxes: true,
+        withDefaultInlineSyntaxes: true,
+      );
       const markdown = '# Heading 1';
 
       final widgets = generator.buildWidgets(markdown, config: config);
@@ -203,7 +206,10 @@ void main() {
 
     testWidgets('should render h2 heading', (tester) async {
       final config = MarkdownConfig();
-      final generator = MarkdownGenerator();
+      final generator = MarkdownGenerator(
+        withDefaultBlockSyntaxes: true,
+        withDefaultInlineSyntaxes: true,
+      );
       const markdown = '## Heading 2';
 
       final widgets = generator.buildWidgets(markdown, config: config);
@@ -219,7 +225,10 @@ void main() {
 
     testWidgets('should render h3-h6 headings', (tester) async {
       final config = MarkdownConfig();
-      final generator = MarkdownGenerator();
+      final generator = MarkdownGenerator(
+        withDefaultBlockSyntaxes: true,
+        withDefaultInlineSyntaxes: true,
+      );
       const markdown = '''### Heading 3
 #### Heading 4
 ##### Heading 5
@@ -238,7 +247,10 @@ void main() {
 
     testWidgets('should render heading with inline formatting', (tester) async {
       final config = MarkdownConfig();
-      final generator = MarkdownGenerator();
+      final generator = MarkdownGenerator(
+        withDefaultBlockSyntaxes: true,
+        withDefaultInlineSyntaxes: true,
+      );
       const markdown = '# **Bold** and *italic* heading';
 
       final widgets = generator.buildWidgets(markdown, config: config);
@@ -254,7 +266,10 @@ void main() {
 
     testWidgets('should generate TOC entries', (tester) async {
       final config = MarkdownConfig();
-      final generator = MarkdownGenerator();
+      final generator = MarkdownGenerator(
+        withDefaultBlockSyntaxes: true,
+        withDefaultInlineSyntaxes: true,
+      );
       const markdown = '''# H1
 ## H2
 ### H3''';
@@ -272,7 +287,10 @@ void main() {
 
     testWidgets('should render heading with divider', (tester) async {
       final config = MarkdownConfig();
-      final generator = MarkdownGenerator();
+      final generator = MarkdownGenerator(
+        withDefaultBlockSyntaxes: true,
+        withDefaultInlineSyntaxes: true,
+      );
       const markdown = '''# Heading with divider
 
 Content below.''';

@@ -49,7 +49,10 @@ void main() {
   group('Blockquote rendering with markdown', () {
     testWidgets('should render simple blockquote', (tester) async {
       final config = MarkdownConfig();
-      final generator = MarkdownGenerator();
+      final generator = MarkdownGenerator(
+        withDefaultBlockSyntaxes: true,
+        withDefaultInlineSyntaxes: true,
+      );
       const markdown = '> This is a blockquote';
 
       final widgets = generator.buildWidgets(markdown, config: config);
@@ -65,7 +68,10 @@ void main() {
 
     testWidgets('should render multi-line blockquote', (tester) async {
       final config = MarkdownConfig();
-      final generator = MarkdownGenerator();
+      final generator = MarkdownGenerator(
+        withDefaultBlockSyntaxes: true,
+        withDefaultInlineSyntaxes: true,
+      );
       const markdown = '''> Line 1
 > Line 2
 > Line 3''';
@@ -83,7 +89,10 @@ void main() {
 
     testWidgets('should render nested blockquotes', (tester) async {
       final config = MarkdownConfig();
-      final generator = MarkdownGenerator();
+      final generator = MarkdownGenerator(
+        withDefaultBlockSyntaxes: true,
+        withDefaultInlineSyntaxes: true,
+      );
       const markdown = '''> Outer quote
 >> Inner quote''';
 
@@ -100,7 +109,10 @@ void main() {
 
     testWidgets('should render blockquote with inline formatting', (tester) async {
       final config = MarkdownConfig();
-      final generator = MarkdownGenerator();
+      final generator = MarkdownGenerator(
+        withDefaultBlockSyntaxes: true,
+        withDefaultInlineSyntaxes: true,
+      );
       const markdown = '> This is **bold** and *italic* text';
 
       final widgets = generator.buildWidgets(markdown, config: config);
@@ -116,7 +128,10 @@ void main() {
 
     testWidgets('should use dark config', (tester) async {
       final config = MarkdownConfig.darkConfig;
-      final generator = MarkdownGenerator();
+      final generator = MarkdownGenerator(
+        withDefaultBlockSyntaxes: true,
+        withDefaultInlineSyntaxes: true,
+      );
       const markdown = '> This is a blockquote with dark config';
 
       final widgets = generator.buildWidgets(markdown, config: config);
@@ -138,7 +153,10 @@ void main() {
       final config = MarkdownConfig(configs: [
         BlockquoteConfig(richTextBuilder: builder),
       ]);
-      final generator = MarkdownGenerator();
+      final generator = MarkdownGenerator(
+        withDefaultBlockSyntaxes: true,
+        withDefaultInlineSyntaxes: true,
+      );
       const markdown = '> Custom styled blockquote';
 
       final widgets = generator.buildWidgets(markdown, config: config);
@@ -156,7 +174,10 @@ void main() {
   group('Blockquote edge cases', () {
     testWidgets('should handle empty blockquote', (tester) async {
       final config = MarkdownConfig();
-      final generator = MarkdownGenerator();
+      final generator = MarkdownGenerator(
+        withDefaultBlockSyntaxes: true,
+        withDefaultInlineSyntaxes: true,
+      );
       const markdown = '>';
 
       final widgets = generator.buildWidgets(markdown, config: config);
@@ -173,7 +194,10 @@ void main() {
 
     testWidgets('should handle blockquote with code', (tester) async {
       final config = MarkdownConfig();
-      final generator = MarkdownGenerator();
+      final generator = MarkdownGenerator(
+        withDefaultBlockSyntaxes: true,
+        withDefaultInlineSyntaxes: true,
+      );
       const markdown = '> ```dart\n> code here\n> ```';
 
       final widgets = generator.buildWidgets(markdown, config: config);
@@ -189,7 +213,10 @@ void main() {
 
     testWidgets('should handle blockquote with links', (tester) async {
       final config = MarkdownConfig();
-      final generator = MarkdownGenerator();
+      final generator = MarkdownGenerator(
+        withDefaultBlockSyntaxes: true,
+        withDefaultInlineSyntaxes: true,
+      );
       const markdown = '> [Link text](https://example.com) in quote';
 
       final widgets = generator.buildWidgets(markdown, config: config);
@@ -207,7 +234,10 @@ void main() {
   group('Blockquote in markdown document', () {
     testWidgets('should handle blockquote among other elements', (tester) async {
       final config = MarkdownConfig();
-      final generator = MarkdownGenerator();
+      final generator = MarkdownGenerator(
+        withDefaultBlockSyntaxes: true,
+        withDefaultInlineSyntaxes: true,
+      );
       const markdown = '''# Title
 
 Regular paragraph.

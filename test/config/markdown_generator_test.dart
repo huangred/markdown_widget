@@ -4,6 +4,36 @@ import 'package:markdown_widget/markdown_widget.dart';
 
 void main() {
   group('MarkdownGenerator', () {
+    test('should leave default block and inline parsing disabled', () {
+      final nodes = <SpanNode>[];
+      final generator = MarkdownGenerator(
+        onNodeAccepted: (node, _) => nodes.add(node),
+      );
+
+      generator.buildWidgets('# Heading\n\n**bold**');
+
+      expect(nodes.whereType<HeadingNode>(), isEmpty);
+      expect(nodes.whereType<StrongNode>(), isEmpty);
+    });
+
+    for (final blockSyntaxes in [false, true]) {
+      for (final inlineSyntaxes in [false, true]) {
+        test('should honor block=$blockSyntaxes and inline=$inlineSyntaxes', () {
+          final nodes = <SpanNode>[];
+          final generator = MarkdownGenerator(
+            withDefaultBlockSyntaxes: blockSyntaxes,
+            withDefaultInlineSyntaxes: inlineSyntaxes,
+            onNodeAccepted: (node, _) => nodes.add(node),
+          );
+
+          generator.buildWidgets('# Heading\n\n**bold**');
+
+          expect(nodes.whereType<HeadingNode>().length, blockSyntaxes ? 1 : 0);
+          expect(nodes.whereType<StrongNode>().length, inlineSyntaxes ? 1 : 0);
+        });
+      }
+    }
+
     test('should build widgets from markdown', () {
       final generator = MarkdownGenerator();
       const markdown = '# Hello World\n\nThis is a paragraph.';
@@ -14,7 +44,7 @@ void main() {
     });
 
     test('should call onTocList with heading nodes', () {
-      final generator = MarkdownGenerator();
+      final generator = MarkdownGenerator(withDefaultBlockSyntaxes: true);
       const markdown = '''# Heading 1
 ## Heading 2
 ### Heading 3''';
@@ -29,6 +59,7 @@ void main() {
     test('should filter headings by headingNodeFilter', () {
       bool filterCalled = false;
       final generator = MarkdownGenerator(
+        withDefaultBlockSyntaxes: true,
         headingNodeFilter: (node) {
           filterCalled = true;
           return node.headingConfig.tag == 'h1';
@@ -48,7 +79,7 @@ void main() {
     });
 
     test('should use default allowAll filter when none provided', () {
-      final generator = MarkdownGenerator();
+      final generator = MarkdownGenerator(withDefaultBlockSyntaxes: true);
       const markdown = '''# H1
 ## H2
 ### H3''';
@@ -278,7 +309,7 @@ void main() {
     });
 
     test('should handle complex markdown document', () {
-      final generator = MarkdownGenerator();
+      final generator = MarkdownGenerator(withDefaultBlockSyntaxes: true);
       const markdown = '''# Main Title
 
 ## Subtitle
@@ -307,6 +338,7 @@ code here
   group('MarkdownGenerator with HeadingNodeFilter', () {
     test('should filter out h3 headings', () {
       final generator = MarkdownGenerator(
+        withDefaultBlockSyntaxes: true,
         headingNodeFilter: (node) => node.headingConfig.tag != 'h3',
       );
 
@@ -326,6 +358,7 @@ code here
 
     test('should only include h1 and h2 headings', () {
       final generator = MarkdownGenerator(
+        withDefaultBlockSyntaxes: true,
         headingNodeFilter: (node) =>
             {'h1', 'h2'}.contains(node.headingConfig.tag),
       );
@@ -553,6 +586,7 @@ This is **bold** and *italic*.''';
 
     test('should work with TOC generation', () {
       final generator = MarkdownGenerator(
+        withDefaultBlockSyntaxes: true,
         preserveEmptyLines: true,
       );
       const markdown = '''# Heading 1
